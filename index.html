@@ -3,9 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flores Amarillas 🌼</title>
+    <title>Para Ti 🌼</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Firebase SDK (Módulos) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // TUS CREDENCIALES DE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpmdTmeyDI5VWVhUCG5LdeAHuUCU_Oh0U",
+            authDomain: "flores-amarillas-fb71a.firebaseapp.com",
+            projectId: "flores-amarillas-fb71a",
+            storageBucket: "flores-amarillas-fb71a.firebasestorage.app",
+            messagingSenderId: "1041767994082",
+            appId: "1:1041767994082:web:30fb11ef59f73a96e0c4bb",
+            measurementId: "G-SD3K3P6E1T"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Función global para agregar deseos
+        window.agregarDeseo = async function() {
+            const input = document.getElementById("wishInput");
+            const texto = input.value.trim();
+            if (texto === "") return;
+
+            try {
+                await addDoc(collection(db, "deseos"), {
+                    item: texto,
+                    fecha: new Date()
+                });
+                input.value = "";
+            } catch (e) {
+                console.error("Error al agregar deseo: ", e);
+            }
+        };
+
+        // Escuchar cambios en la base de datos en tiempo real
+        const q = query(collection(db, "deseos"), orderBy("fecha", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const listContainer = document.getElementById("wishList");
+            listContainer.innerHTML = "";
+            if (snapshot.empty) {
+                listContainer.innerHTML = "<p style='color:#888;'>Aún no hay deseos en la lista. ¡Agrega el primero! ✨</p>";
+                return;
+            }
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const item = document.createElement("div");
+                item.className = "wish-item";
+                item.innerHTML = `🎁 <span>${data.item}</span>`;
+                listContainer.appendChild(item);
+            });
+        });
+    </script>
+
     <style>
         :root {
             --bg-color: #fffdf0;
@@ -23,8 +80,67 @@
             text-align: center;
         }
 
+        /* PANTALLA LOGIN */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(212, 172, 13, 0.2);
+            border: 2px solid #ffeaa7;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+        }
+
+        input:focus {
+            border-color: var(--primary-yellow);
+        }
+
+        .btn {
+            background-color: var(--primary-yellow);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-gold);
+            transform: translateY(-2px);
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        #main-content {
+            display: none;
+        }
+
         header {
-            padding: 50px 20px 30px;
+            padding: 40px 20px 20px;
             background: linear-gradient(180deg, #fff3b0 0%, var(--bg-color) 100%);
         }
 
@@ -32,11 +148,11 @@
             font-family: 'Dancing Script', cursive;
             font-size: 3.5rem;
             color: var(--accent-gold);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .container {
-            max-width: 700px;
+            max-width: 650px;
             margin: auto;
             padding: 20px;
         }
@@ -50,125 +166,192 @@
             border: 2px solid #ffeaa7;
         }
 
-        .flower-btn {
-            background-color: var(--primary-yellow);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
-            margin: 10px 5px;
-        }
-
-        .flower-btn:hover {
-            transform: translateY(-3px);
-            background-color: var(--accent-gold);
-        }
-
-        .messages {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .msg-box {
-            background: #fffbe6;
-            padding: 18px;
-            border-radius: 12px;
-            border: 1px dashed var(--primary-yellow);
-            font-size: 0.95rem;
-        }
-
-        .coupon {
-            background: linear-gradient(135deg, #fff9db 0%, #fff3b0 100%);
-            border: 2px dashed #f1c40f;
-            border-radius: 15px;
-            padding: 20px;
+        /* CONTADOR */
+        .countdown {
+            display: flex;
+            justify-content: space-around;
             margin-top: 15px;
         }
 
-        audio {
+        .time-box {
+            background: #fffbe6;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 70px;
+            border: 1px dashed var(--primary-yellow);
+        }
+
+        .time-box span {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            display: block;
+        }
+
+        /* LISTA DE DESEOS */
+        .wish-input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .wish-input-group input {
+            width: 70%;
+            margin: 0;
+            text-align: left;
+        }
+
+        .wish-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .wish-item {
+            background: #fffbe6;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: left;
+            border-left: 4px solid var(--primary-yellow);
+            font-weight: 500;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
             display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Música de fondo opcional -->
-    <audio id="bg-music" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
-    </audio>
-
-    <header>
-        <h1>Un Detalle Amarillo Para Ti 🌼</h1>
-        <p>Un pequeño espacio en internet para recordarte lo especial que eres.</p>
-        <button class="flower-btn" onclick="lanzarFlores()">✨ ¡Lluvia Amarilla!</button>
-        <button class="flower-btn" style="background-color: #e67e22;" onclick="toggleMusica()">🎵 Música On/Off</button>
-    </header>
-
-    <div class="container">
-        <div class="card">
-            <h2>Razones por las que te mereces estas flores 💛</h2>
-            <div class="messages">
-                <div class="msg-box">🌻 <b>Tu buena energía</b> siempre contagia a todos a tu alrededor.</div>
-                <div class="msg-box">🌟 <b>Tu amistad vale oro</b> y es un regalo tenerte cerca.</div>
-                <div class="msg-box">🌼 <b>Porque te mereces detalles bonitos</b> hoy y siempre.</div>
-            </div>
+    <!-- 1. PANTALLA DE LOGIN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2 style="color: var(--accent-gold); font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-top:0;">Acceso Especial 🌼</h2>
+            <p style="font-size: 0.9rem; color: #666;">Ingresa los datos para ver tu regalo:</p>
+            <input type="text" id="username" placeholder="Usuario">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button class="btn" onclick="validarLogin()">Entrar ✨</button>
+            <p id="error" class="error-msg">Usuario o contraseña incorrectos</p>
         </div>
+    </div>
 
-        <div class="card">
-            <h2>Vale Especial 🎟️</h2>
-            <div class="coupon">
-                <h3>☕ Vale por un Café / Salida</h3>
-                <p>Canjeable en cualquier momento para ponernos al día y platicar.</p>
+    <!-- 2. CONTENIDO PRINCIPAL -->
+    <div id="main-content">
+        <header>
+            <h1>¡Hola de Nuevo! 🌼</h1>
+            <p>Un espacio especial guardado solo para ti.</p>
+        </header>
+
+        <div class="container">
+            <!-- SECCIÓN CONTADOR -->
+            <div class="card">
+                <h2>Tiempo para tu Cumpleaños 🎂</h2>
+                <div class="countdown">
+                    <div class="time-box"><span id="days">00</span>Días</div>
+                    <div class="time-box"><span id="hours">00</span>Horas</div>
+                    <div class="time-box"><span id="minutes">00</span>Min</div>
+                    <div class="time-box"><span id="seconds">00</span>Seg</div>
+                </div>
             </div>
+
+            <!-- SECCIÓN LISTA DE DESEOS/REGALOS -->
+            <div class="card">
+                <h2>Tu Lista de Deseos 🎁</h2>
+                <p style="font-size: 0.9rem; color: #666;">Escribe los regalos o cosas que te gustaría tener y se guardarán automáticamente en la nube.</p>
+                
+                <div class="wish-input-group">
+                    <input type="text" id="wishInput" placeholder="Ej. Un libro, unos audífonos...">
+                    <button class="btn" style="margin: 0; padding: 10px 20px;" onclick="agregarDeseo()">Agregar</button>
+                </div>
+
+                <div id="wishList" class="wish-list">
+                    <!-- Los elementos se cargan en tiempo real desde Firebase -->
+                </div>
+            </div>
+
+            <button class="btn" style="background-color: #888; font-size: 0.8rem;" onclick="cerrarSesion()">Cerrar Sesión</button>
         </div>
     </div>
 
     <script>
-        function lanzarFlores() {
-            var duration = 3 * 1000;
-            var end = Date.now() + duration;
+        // ⚙️ EDITA AQUÍ TU USUARIO Y CONTRASEÑA ⚙️
+        const USUARIO_CORRECTO = "amiga";       // 👈 Cambia tu usuario
+        const CLAVE_CORRECTA = "1234";           // 👈 Cambia tu contraseña
+        
+        // ⚙️ EDITA AQUÍ LA FECHA DE CUMPLEAÑOS (Año, Mes-1, Día) ⚙️
+        // Los meses en JavaScript van de 0 a 11 (Enero = 0, Diciembre = 11)
+        const FECHA_CUMPLE = new Date(2026, 11, 25, 0, 0, 0); // Ejemplo: 25 de Diciembre
 
-            (function frame() {
-                confetti({
-                    particleCount: 4,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 },
-                    colors: ['#f1c40f', '#d4ac0d', '#ffeaa7', '#ffffff']
-                });
-                confetti({
-                    particleCount: 4,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 },
-                    colors: ['#f1c40f', '#d4ac0d', '#ffeaa7', '#ffffff']
-                });
+        // VALIDAR LOGIN Y PERSISTENCIA DE SESIÓN
+        function validarLogin() {
+            const user = document.getElementById("username").value.trim();
+            const pass = document.getElementById("password").value.trim();
 
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
-            }());
-        }
-
-        function toggleMusica() {
-            var audio = document.getElementById("bg-music");
-            if (audio.paused) {
-                audio.play();
+            if (user === USUARIO_CORRECTO && pass === CLAVE_CORRECTA) {
+                localStorage.setItem("sesion_iniciada", "true");
+                mostrarContenido();
             } else {
-                audio.pause();
+                document.getElementById("error").style.display = "block";
             }
         }
 
-        window.onload = function() {
+        function mostrarContenido() {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
             lanzarFlores();
-        };
+            iniciarContador();
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem("sesion_iniciada");
+            location.reload();
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("sesion_iniciada") === "true") {
+                mostrarContenido();
+            }
+        });
+
+        // LÓGICA DEL CONTADOR REGRESIVO
+        function iniciarContador() {
+            function actualizar() {
+                const ahora = new Date().getTime();
+                const diferencia = FECHA_CUMPLE - ahora;
+
+                if (diferencia <= 0) {
+                    document.querySelector(".countdown").innerHTML = "<h3>🎉 ¡¡FELIZ CUMPLEAÑOS!! 🥳</h3>";
+                    return;
+                }
+
+                const d = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+                document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+                document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+                document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+            }
+
+            actualizar();
+            setInterval(actualizar, 1000);
+        }
+
+        // EFECTO DE FLORES/CONFETI
+        function lanzarFlores() {
+            confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#f1c40f', '#d4ac0d', '#ffeaa7']
+            });
+        }
     </script>
 </body>
 </html>
