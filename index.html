@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flores Amarillas 🌼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #fffdf0;
+            --primary-yellow: #f1c40f;
+            --accent-gold: #d4ac0d;
+            --text-color: #4a4a4a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        header {
+            padding: 50px 20px 30px;
+            background: linear-gradient(180deg, #fff3b0 0%, var(--bg-color) 100%);
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(212, 172, 13, 0.15);
+            margin-bottom: 25px;
+            border: 2px solid #ffeaa7;
+        }
+
+        .flower-btn {
+            background-color: var(--primary-yellow);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4);
+            margin: 10px 5px;
+        }
+
+        .flower-btn:hover {
+            transform: translateY(-3px);
+            background-color: var(--accent-gold);
+        }
+
+        .messages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .msg-box {
+            background: #fffbe6;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px dashed var(--primary-yellow);
+            font-size: 0.95rem;
+        }
+
+        .coupon {
+            background: linear-gradient(135deg, #fff9db 0%, #fff3b0 100%);
+            border: 2px dashed #f1c40f;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Música de fondo opcional -->
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+    </audio>
+
+    <header>
+        <h1>Un Detalle Amarillo Para Ti 🌼</h1>
+        <p>Un pequeño espacio en internet para recordarte lo especial que eres.</p>
+        <button class="flower-btn" onclick="lanzarFlores()">✨ ¡Lluvia Amarilla!</button>
+        <button class="flower-btn" style="background-color: #e67e22;" onclick="toggleMusica()">🎵 Música On/Off</button>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Razones por las que te mereces estas flores 💛</h2>
+            <div class="messages">
+                <div class="msg-box">🌻 <b>Tu buena energía</b> siempre contagia a todos a tu alrededor.</div>
+                <div class="msg-box">🌟 <b>Tu amistad vale oro</b> y es un regalo tenerte cerca.</div>
+                <div class="msg-box">🌼 <b>Porque te mereces detalles bonitos</b> hoy y siempre.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Vale Especial 🎟️</h2>
+            <div class="coupon">
+                <h3>☕ Vale por un Café / Salida</h3>
+                <p>Canjeable en cualquier momento para ponernos al día y platicar.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function lanzarFlores() {
+            var duration = 3 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 4,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#f1c40f', '#d4ac0d', '#ffeaa7', '#ffffff']
+                });
+                confetti({
+                    particleCount: 4,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#f1c40f', '#d4ac0d', '#ffeaa7', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function toggleMusica() {
+            var audio = document.getElementById("bg-music");
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        window.onload = function() {
+            lanzarFlores();
+        };
+    </script>
+</body>
+</html>
